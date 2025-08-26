@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { BookOpen, FileText, Youtube } from 'lucide-react';
-import { Label } from "@/components/ui/label";
+import { useState } from 'react';
 
 const courses = [
   { id: 'btech', label: 'B.Tech' },
@@ -70,7 +70,8 @@ const StudyTipsSection = () => {
     setPyqError(null);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pyqs?subject=${selectedSubject.trim()}`);
+      const API_URL = import.meta.env.VITE_BACKEND_URL;
+      const res = await fetch(`${API_URL}/api/pyqs?subject=${selectedSubject.trim()}`);
       const data = await res.json();
 
       if (res.ok) {

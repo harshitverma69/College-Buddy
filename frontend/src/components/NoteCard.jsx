@@ -32,7 +32,8 @@ const NoteCard = ({ note, onLike }) => {
             setDownloading(true);
             
             // Record download in backend
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notes/${note.id}/download`, {
+            const API_URL = import.meta.env.VITE_BACKEND_URL;
+            await fetch(`${API_URL}/api/notes/${note.id}/download`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

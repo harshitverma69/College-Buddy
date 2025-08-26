@@ -79,7 +79,8 @@ const NotesSection = () => {
     const fetchNotes = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notes`);
+            const API_URL = import.meta.env.VITE_BACKEND_URL;
+            const response = await fetch(`${API_URL}/api/notes`);
             if (response.ok) {
                 const data = await response.json();
                 // Transform backend data to match frontend format
@@ -157,7 +158,7 @@ const NotesSection = () => {
             formData.append('file', selectedFile);
             formData.append('uploader', 'You'); // This should come from auth context
 
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notes/upload`, {
+            const response = await fetch(`${API_URL}/api/notes/upload`, {
                 method: 'POST',
                 body: formData,
             });
