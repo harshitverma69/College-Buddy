@@ -1,16 +1,16 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
     const location = useLocation();
-    const { isAuthenticated, logout } = useAuth(); // Get auth state and logout function
+    const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
       logout();
-      navigate('/'); // Redirect to home page after logout
+      navigate('/');
     };
 
     return (<nav className="bg-white bg-opacity-80 backdrop-blur-sm shadow-sm fixed w-full top-0 z-50">
@@ -52,15 +52,20 @@ const Navbar = () => {
             </div>
           </div>
           
-          <div>
+          <div className="flex items-center space-x-3">
             {isAuthenticated ? (
-              <Button
-                variant="outline"
-                className="border-buddy-lavender text-buddy-lavender hover:bg-buddy-lavender hover:text-white"
-                onClick={handleLogout}
-              >
-                Sign Out
-              </Button>
+              <>
+                <span className="text-sm text-gray-700 hidden sm:block">
+                  Welcome, {user?.name || 'User'}!
+                </span>
+                <Button
+                  variant="outline"
+                  className="border-buddy-lavender text-buddy-lavender hover:bg-buddy-lavender hover:text-white"
+                  onClick={handleLogout}
+                >
+                  Sign Out
+                </Button>
+              </>
             ) : (
               <Link to="/signin">
                 <Button variant="outline" className="border-buddy-lavender text-buddy-lavender hover:bg-buddy-lavender hover:text-white">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { useAuth } from '../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,8 +11,9 @@ const SignUpPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { login } = useAuth(); // Get login function from AuthContext
-  const navigate = useNavigate(); // For redirection
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,31 +21,42 @@ const SignUpPage = () => {
       alert("Passwords do not match!");
       return;
     }
+    
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long!");
+      return;
+    }
+    
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', { // Ensure backend is on same domain or CORS is set up
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }), // Only send email and password as per backend model
+        body: JSON.stringify({ name, email, password }),
       });
+      
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.msg || 'Failed to register');
       }
 
-      login(data.token); // Log the user in with the token from registration
-      navigate('/'); // Redirect to homepage
+      // If registration is successful, navigate to OTP verification page
+      navigate('/verify-otp', { state: { email: data.email, userId: data.userId } });
+
     } catch (error) {
       console.error('Registration error:', error);
       alert(`Registration failed: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8"> {/* Removed background gradient */}
-      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm"> {/* Added translucent background to card */}
+    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold font-outfit text-buddy-lavender">Create Account</CardTitle>
           <CardDescription>Join College Buddy today!</CardDescription>
@@ -82,10 +94,11 @@ const SignUpPage = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder="Create a password (min 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
                 className="mt-1"
               />
             </div>
@@ -103,8 +116,8 @@ const SignUpPage = () => {
               />
             </div>
             
-            <Button type="submit" className="w-full cta-button">
-              Register
+            <Button type="submit" className="w-full cta-button" disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Register'}
             </Button>
           </form>
         </CardContent>
