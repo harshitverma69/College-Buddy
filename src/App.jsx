@@ -17,6 +17,7 @@ import FaqPage from "./pages/FaqPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import NotFound from "./pages/NotFound";
+import OtpVerificationPage from "./pages/OtpVerificationPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -51,6 +52,7 @@ const App = () => (
                 <Route path="/faq" element={<FaqPage />}/>
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />}/>
                 <Route path="/terms-of-service" element={<TermsOfServicePage />}/>
+                <Route path="/verify-otp" element={<OtpVerificationPage />}/>
                 <Route path="*" element={<NotFound />}/>
               </Routes>
             </main>
