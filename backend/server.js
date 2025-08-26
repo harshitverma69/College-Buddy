@@ -37,6 +37,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Root route for Vercel deployment check
+app.get('/', (req, res) => {
+  res.send('🚀 Backend is up and running!');
+});
+
 // Routes
 app.use('/api/pyqs', pyqRoutes);
 app.use('/api/notes', notesRoutes);
