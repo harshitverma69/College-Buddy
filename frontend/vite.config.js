@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // Your backend server address
+        target: process.env.VITE_BACKEND_URL, // Your backend server address
         changeOrigin: true,
         ws: true, // Added for completeness, though likely not the issue for HTTP
         configure: (proxy, _options) => {
