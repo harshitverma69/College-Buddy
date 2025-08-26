@@ -1,35 +1,24 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
-
+const express= require('express');
 const app = express();
-
-// Super early log for all requests to see if they even hit the app
-app.use((req, res, next) => {
-  console.log(`Backend: Incoming request: ${req.method} ${req.originalUrl}`);
-  if (req.originalUrl.startsWith('/api/auth/login')) {
-    console.log('Backend: Request to /api/auth/login detected early. Body:', req.body);
-  }
-  next();
-});
-
+const PORT=5000;
+const pyqs= require("./data.json")
+const cors = require('cors');
 app.use(cors());
-app.use(express.json()); // Make sure express.json() is before routes that need parsed body
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("Connected to MongoDB Atlas"))
-.catch(err => console.error("Mongo error: ", err));
-
-// Import auth routes
-const authRoutes = require('./routes/auth');
-
-// Routes
-app.use('/api/auth', authRoutes);
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get('/api/pyqs', (req, res) => {
+    const subject= req.query.subject?.toLowerCase();
+    if(!subject) {
+        return res.status(400).json({ error: 'Subject query parameter is required' });
+    }
+    const result= pyqs.find((item)=>
+        item.subject.toLowerCase().includes(subject)
+    );
+    if(!result){
+        return res.status(404).json({ error: 'No PYQ found for the specified subject' });
+    }
+    return res.json(result);
+});
+//server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});

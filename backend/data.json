@@ -1,0 +1,14 @@
+[
+  {
+    "subject": "Computer Networks",
+    "semester": 5,
+    "branch": "CSE",
+    "pdf_url": "https://example.com/cn.pdf"
+  },
+  {
+    "subject": "DBMS",
+    "semester": 5,
+    "branch": "CSE",
+    "pdf_url": "https://example.com/dbms.pdf"
+  }
+]
