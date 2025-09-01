@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '../contexts/AuthContext';
 
+const API_BASE_URL = 'https://college-buddy-backend.onrender.com/api/auth';
+
 const OtpVerificationPage = () => {
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +28,7 @@ const OtpVerificationPage = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/verify-otp', {
+      const response = await fetch(`${API_BASE_URL}/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

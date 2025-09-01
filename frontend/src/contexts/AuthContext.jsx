@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
+const API_BASE_URL = 'https://college-buddy-backend.onrender.com/api/auth';
+
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -47,8 +49,9 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch(`${API_BASE_URL}/profile`, {
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
