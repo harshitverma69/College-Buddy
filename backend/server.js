@@ -37,7 +37,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Root route for Vercel deployment check
+// Root route
 app.get('/', (req, res) => {
   res.send('🚀 Backend is up and running!');
 });
@@ -52,4 +52,7 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-module.exports = app;
+// ✅ Start server (needed for Render)
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
