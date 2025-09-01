@@ -150,6 +150,7 @@ const NotesSection = () => {
             setUploading(true);
             setUploadMessage({ type: '', message: '' });
 
+            const API_URL = import.meta.env.VITE_BACKEND_URL; // Define API_URL here
             const formData = new FormData();
             formData.append('title', noteTitle);
             formData.append('subject', noteSubject);
