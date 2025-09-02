@@ -88,6 +88,11 @@ const SignInPage = () => {
                 className="mt-1"
               />
             </div>
+            <div className="text-sm text-right">
+              <Link to="/forgot-password" className="font-medium text-buddy-lavender hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <Button
               type="submit"
               className="w-full cta-button"

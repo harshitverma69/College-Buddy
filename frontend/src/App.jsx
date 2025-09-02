@@ -18,6 +18,8 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import NotFound from "./pages/NotFound";
 import OtpVerificationPage from "./pages/OtpVerificationPage";
+import ForgotPasswordPage from "./pages/ForgotPassword";
+import ResetPasswordPage from "./pages/ResetPassword";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -53,6 +55,8 @@ const App = () => (
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />}/>
                 <Route path="/terms-of-service" element={<TermsOfServicePage />}/>
                 <Route path="/verify-otp" element={<OtpVerificationPage />}/>
+                <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
+                <Route path="/reset-password/:token" element={<ResetPasswordPage />}/>
                 <Route path="*" element={<NotFound />}/>
               </Routes>
             </main>

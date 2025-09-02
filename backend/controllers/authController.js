@@ -183,3 +183,76 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ msg: 'Internal server error' });
   }
 };
+
+// Forgot Password
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User with that email does not exist' });
+    }
+
+    // Generate a reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Send reset password email
+    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`; // Frontend URL
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: 'College Buddy - Password Reset Request',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2>Password Reset Request</h2>
+          <p>Hello ${user.name},</p>
+          <p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+          <p>Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:</p>
+          <p><a href="${resetUrl}">${resetUrl}</a></p>
+          <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+          <p>Best regards,</p>
+          <p>The College Buddy Team</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ msg: 'Password reset email sent successfully' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ msg: 'Internal server error' });
+  }
+};
+
+// Reset Password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ msg: 'Password reset token is invalid or has expired.' });
+    }
+
+    user.password = password; // Mongoose pre-save hook will hash this
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    user.isVerified = true; // Ensure user is verified after password reset
+    await user.save();
+
+    res.status(200).json({ msg: 'Password has been reset successfully.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ msg: 'Internal server error' });
+  }
+};
