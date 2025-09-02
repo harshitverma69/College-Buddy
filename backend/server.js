@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const pyqRoutes = require('./routes/pyqRoutes');
 const notesRoutes = require('./routes/notesRoutes');
@@ -11,8 +12,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [process.env.FRONTEND_URL]; // Your Vercel frontend URL
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true, // Allow cookies to be sent
+}));
 app.use(express.json());
+app.use(cookieParser()); // Use cookie-parser middleware
 
 // Error handling middleware
 app.use((err, req, res, next) => {

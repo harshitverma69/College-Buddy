@@ -12,7 +12,12 @@ export default defineConfig(({ mode }) => ({
       '/api': {
         target: process.env.VITE_BACKEND_URL, // Your backend server address
         changeOrigin: true,
-        ws: true, // Added for completeness, though likely not the issue for HTTP
+        ws: true,
+        secure: false, // If your backend is HTTPS, set this to true
+        // Add this to handle cookies correctly across domains
+        cookieDomainRewrite: {
+          "*": "" // Rewrites cookie domain to match the frontend domain
+        },
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('Vite Proxy error:', err);
@@ -24,7 +29,7 @@ export default defineConfig(({ mode }) => ({
             console.log('Vite Proxy: Received response from target:', proxyRes.statusCode, req.url);
           });
         },
-        logLevel: 'debug' // Added for more verbose proxy logging
+        logLevel: 'debug'
       }
     }
   },

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const API_BASE_URL = 'https://college-buddy-backend.onrender.com/api/auth';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/auth';
 
 const SignUpPage = () => {
   const [name, setName] = useState('');

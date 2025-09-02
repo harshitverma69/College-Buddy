@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast"; // Import useToast
 
-const API_BASE_URL = 'https://college-buddy-backend.onrender.com/api/auth';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/auth';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
+  const { toast } = useToast(); // Initialize useToast
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage('');
-    setError('');
 
     try {
       const response = await fetch(`${API_BASE_URL}/forgot-password`, {
@@ -30,13 +29,27 @@ const ForgotPasswordPage = () => {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.msg || 'Failed to send password reset email');
+      if (response.ok) {
+        toast({
+          title: "Password Reset Email Sent",
+          description: data.msg,
+          variant: "success",
+        });
+        navigate('/message-sent'); // Navigate to a success page
+      } else {
+        toast({
+          title: "Failed to Send Reset Email",
+          description: data.msg || 'Failed to send reset email',
+          variant: "destructive",
+        });
       }
-
-      setMessage(data.msg);
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      toast({
+        title: "Failed to Send Reset Email",
+        description: `Failed to send reset email: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +85,6 @@ const ForgotPasswordPage = () => {
             >
               {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
-            {message && <p className="text-green-600 text-center">{message}</p>}
-            {error && <p className="text-red-600 text-center">{error}</p>}
           </form>
         </CardContent>
         <div className="mt-4 text-center text-sm">

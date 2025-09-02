@@ -6,7 +6,7 @@ const crypto = require('crypto');
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET || 'your-secret-key', {
-    expiresIn: '24h'
+    expiresIn: '1d' // Token expires in 1 day
   });
 };
 
@@ -146,9 +146,16 @@ exports.login = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
+    // Set token in an HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      sameSite: 'None', // Required for cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
     res.json({
       msg: 'Login successful',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -162,17 +169,21 @@ exports.login = async (req, res) => {
   }
 };
 
-// Logout user (client-side token removal is sufficient for JWT, but we can add a blacklist if needed)
+// Logout user
 exports.logout = (req, res) => {
-  // For JWT, logout is typically handled client-side by removing the token.
-  // If server-side token invalidation (e.g., blacklisting) is required,
-  // it would be implemented here. For now, we just send a success message.
+  res.cookie('token', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None',
+    expires: new Date(0) // Expire the cookie immediately
+  });
   res.json({ msg: 'Logged out successfully' });
 };
 
 // Get user profile (protected route)
 exports.getProfile = async (req, res) => {
   try {
+    // req.userId is set by the auth middleware from the token in the cookie
     const user = await User.findById(req.userId).select('-password');
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
@@ -201,7 +212,7 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     // Send reset password email
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`; // Frontend URL
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`; // Frontend URL from .env
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,

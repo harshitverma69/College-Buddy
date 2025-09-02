@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from "@/components/ui/use-toast"; // Import useToast
 
-const API_BASE_URL = 'https://college-buddy-backend.onrender.com/api/auth';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/auth';
 
 const OtpVerificationPage = () => {
   const [otp, setOtp] = useState('');
@@ -14,6 +15,7 @@ const OtpVerificationPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { toast } = useToast(); // Initialize useToast
 
   const email = location.state?.email;
   const userId = location.state?.userId; // Only available from signup
@@ -38,16 +40,28 @@ const OtpVerificationPage = () => {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.msg || 'OTP verification failed');
+      if (response.ok) {
+        login(data.user); // Token is now in httpOnly cookie
+        toast({
+          title: "OTP Verified",
+          description: data.msg,
+          variant: "success",
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: "OTP Verification Failed",
+          description: data.msg || 'OTP verification failed',
+          variant: "destructive",
+        });
       }
-
-      alert(data.msg);
-      login(data.token, data.user);
-      navigate('/');
     } catch (error) {
       console.error('OTP verification error:', error);
-      alert(`OTP verification failed: ${error.message}`);
+      toast({
+        title: "OTP Verification Failed",
+        description: `OTP verification failed: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

@@ -1,20 +1,18 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
-const API_BASE_URL = 'https://college-buddy-backend.onrender.com/api/auth';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/auth';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
-  const isAuthenticated = !!token;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Handle automatic logout when website is closed
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Clear token when user closes the website
-      localStorage.removeItem('token');
+      // No need to clear token from localStorage if using httpOnly cookies
     };
 
     const handleVisibilityChange = () => {
@@ -37,63 +35,78 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  // Fetch user profile when token changes
+  // Fetch user profile on component mount and when isAuthenticated changes
   useEffect(() => {
-    if (token) {
-      fetchUserProfile();
-    } else {
-      setUser(null);
-      setIsVerified(false);
-    }
-  }, [token]);
+    fetchUserProfile();
+  }, [isAuthenticated]); // Depend on isAuthenticated to refetch after login/logout
 
   const fetchUserProfile = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/profile`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+        },
+        // With credentials to send HTTP-only cookies
+        credentials: 'include',
       });
       
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
         setIsVerified(data.user.isVerified);
+        setIsAuthenticated(true);
       } else {
-        // Token is invalid, logout
-        logout();
+        // If response is not OK, it means the token is invalid or expired
+        // or user is not authenticated.
+        // We should clear user data and set isAuthenticated to false.
+        setUser(null);
+        setIsVerified(false);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      logout();
+      setUser(null);
+      setIsVerified(false);
+      setIsAuthenticated(false);
     }
   };
 
-  const login = (newToken, userData) => {
-    console.log('AuthContext: login function called with token:', newToken);
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
+  const login = (userData) => {
+    console.log('AuthContext: login function called with user data:', userData);
+    // Token is now handled by httpOnly cookie, no need to store in localStorage
     setUser(userData);
     setIsVerified(userData.isVerified);
-    console.log('AuthContext: token state after login attempt:', newToken);
+    setIsAuthenticated(true);
+    console.log('AuthContext: isAuthenticated state after login attempt:', true);
   };
 
-  const logout = () => {
+  const logout = async () => {
     console.log('AuthContext: logout function called');
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
-    setIsVerified(false);
-    console.log('AuthContext: token state after logout attempt: null');
+    try {
+      // Call backend logout endpoint to clear httpOnly cookie
+      await fetch(`${API_BASE_URL}/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Error during backend logout:', error);
+    } finally {
+      setUser(null);
+      setIsVerified(false);
+      setIsAuthenticated(false);
+      console.log('AuthContext: isAuthenticated state after logout attempt:', false);
+    }
   };
   
-  console.log('AuthContext: Current token state:', token);
   console.log('AuthContext: Current isAuthenticated state:', isAuthenticated);
   console.log('AuthContext: Current user state:', user);
 
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated, isVerified, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isVerified, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
