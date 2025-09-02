@@ -52,7 +52,27 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// ✅ Start server (needed for Render)
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// Function to start the server
+const startServer = (port, retries = 0) => {
+  const MAX_RETRIES = 5; // Maximum number of retries
+
+  app.listen(port, () => {
+    console.log(`🚀 Server running on port ${port}`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      if (retries < MAX_RETRIES) {
+        console.warn(`Port ${port} is already in use. Retrying with port ${port + 1}...`);
+        startServer(port + 1, retries + 1);
+      } else {
+        console.error(`All retry attempts failed. Port ${port} is in use and no other ports are available.`);
+        process.exit(1); // Exit if max retries reached
+      }
+    } else {
+      console.error('Server error:', err);
+      process.exit(1); // Exit for other errors
+    }
+  });
+};
+
+// Start the server with the initial port
+startServer(PORT);
