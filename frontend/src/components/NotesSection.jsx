@@ -150,7 +150,6 @@ const NotesSection = () => {
             setUploading(true);
             setUploadMessage({ type: '', message: '' });
 
-            const API_URL = import.meta.env.VITE_BACKEND_URL; // Define API_URL here
             const formData = new FormData();
             formData.append('title', noteTitle);
             formData.append('subject', noteSubject);
@@ -158,6 +157,7 @@ const NotesSection = () => {
             formData.append('semester', noteSemester);
             formData.append('file', selectedFile);
             formData.append('uploader', 'You'); // This should come from auth context
+            const API_URL = import.meta.env.VITE_BACKEND_URL;
 
             const response = await fetch(`${API_URL}/api/notes/upload`, {
                 method: 'POST',

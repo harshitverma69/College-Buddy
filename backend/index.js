@@ -1,9 +1,15 @@
 const express= require('express');
 const app = express();
 const PORT=5000 || process.env.PORT;
-const pyqs= require("./data.json")
+const pyqs= require("./data.json");
 const cors = require('cors');
+const notesRoutes = require('./routes/notesRoutes'); // Import notes routes
 app.use(cors());
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+
+// Use notes routes
+app.use('/api/notes', notesRoutes);
 
 app.get('/api/pyqs', (req, res) => {
     const subject= req.query.subject?.toLowerCase();
