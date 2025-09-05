@@ -70,7 +70,7 @@ const StudyTipsSection = () => {
     setPyqError(null);
 
     try {
-      const API_URL = import.meta.env.VITE_BACKEND_URL;
+      const API_URL = import.meta.env.VITE_API_URL;
       const res = await fetch(`${API_URL}/api/pyqs?subject=${selectedSubject.trim()}`);
       const data = await res.json();
 

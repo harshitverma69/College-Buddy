@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from "@/components/ui/use-toast"; // Import useToast
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/auth';
+const API_BASE_URL = import.meta.env.VITE_API_URL + '/api/auth';
 
 const OtpVerificationPage = () => {
   const [otp, setOtp] = useState('');
