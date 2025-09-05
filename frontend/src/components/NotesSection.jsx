@@ -9,6 +9,8 @@ import NoteCard from "@/components/NoteCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Mock data for initial notes
 const initialNotes = [
     {
@@ -79,7 +81,6 @@ const NotesSection = () => {
     const fetchNotes = async () => {
         try {
             setLoading(true);
-            const API_URL = import.meta.env.VITE_API_URL;
             const response = await fetch(`${API_URL}/api/notes`);
             if (response.ok) {
                 const data = await response.json();
@@ -157,7 +158,6 @@ const NotesSection = () => {
             formData.append('semester', noteSemester);
             formData.append('file', selectedFile);
             formData.append('uploader', 'You'); // This should come from auth context
-            const API_URL = import.meta.env.VITE_API_URL;
 
             const response = await fetch(`${API_URL}/api/notes/upload`, {
                 method: 'POST',
@@ -271,20 +271,20 @@ const NotesSection = () => {
                             <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="title">Note Title *</Label>
-                                    <Input 
-                                        id="title" 
-                                        placeholder="e.g. Data Structures Cheat Sheet" 
-                                        value={noteTitle} 
+                                    <Input
+                                        id="title"
+                                        placeholder="e.g. Data Structures Cheat Sheet"
+                                        value={noteTitle}
                                         onChange={(e) => setNoteTitle(e.target.value)}
                                         required
                                     />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="subject">Subject *</Label>
-                                    <Input 
-                                        id="subject" 
-                                        placeholder="e.g. Computer Science" 
-                                        value={noteSubject} 
+                                    <Input
+                                        id="subject"
+                                        placeholder="e.g. Computer Science"
+                                        value={noteSubject}
                                         onChange={(e) => setNoteSubject(e.target.value)}
                                         required
                                     />
@@ -323,10 +323,10 @@ const NotesSection = () => {
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="file">Upload File *</Label>
-                                    <Input 
-                                        id="file" 
-                                        type="file" 
-                                        onChange={handleFileChange} 
+                                    <Input
+                                        id="file"
+                                        type="file"
+                                        onChange={handleFileChange}
                                         className="cursor-pointer"
                                         accept=".pdf,.docx,.ppt,.pptx"
                                         required
@@ -335,9 +335,9 @@ const NotesSection = () => {
                                 </div>
                             </div>
                             <DialogFooter className="sm:justify-end">
-                                <Button 
-                                    type="submit" 
-                                    onClick={handleUpload} 
+                                <Button
+                                    type="submit"
+                                    onClick={handleUpload}
                                     disabled={!noteTitle || !noteSubject || !noteCourse || !noteSemester || !selectedFile || uploading}
                                     className="w-full"
                                 >
@@ -400,10 +400,10 @@ const NotesSection = () => {
                 </div>
                 <div>
                     <Label htmlFor="search">Search Notes</Label>
-                    <Input 
-                        id="search" 
-                        placeholder="Search by title or subject..." 
-                        value={searchQuery} 
+                    <Input
+                        id="search"
+                        placeholder="Search by title or subject..."
+                        value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
@@ -428,7 +428,7 @@ const NotesSection = () => {
                         <Book size={48} className="text-gray-400 mb-4"/>
                         <h3 className="text-xl font-semibold text-gray-700">No notes found</h3>
                         <p className="text-gray-500 text-center mt-2">
-                            {searchQuery || courseFilter !== "All" || semesterFilter !== "All" 
+                            {searchQuery || courseFilter !== "All" || semesterFilter !== "All"
                                 ? "Try adjusting your filters or search terms"
                                 : "Be the first to upload some notes to get started!"
                             }

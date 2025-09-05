@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BookOpen, FileText, Youtube } from 'lucide-react';
 import { useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const courses = [
   { id: 'btech', label: 'B.Tech' },
   { id: 'bpharm', label: 'B.Pharm' },
@@ -70,7 +72,6 @@ const StudyTipsSection = () => {
     setPyqError(null);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL;
       const res = await fetch(`${API_URL}/api/pyqs?subject=${selectedSubject.trim()}`);
       const data = await res.json();
 

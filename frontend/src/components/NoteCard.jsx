@@ -5,6 +5,8 @@ import { Eye, Download, Heart, Calendar, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const NoteCard = ({ note, onLike }) => {
     const { isAuthenticated } = useAuth();
     const [downloading, setDownloading] = useState(false);
@@ -14,10 +16,10 @@ const NoteCard = ({ note, onLike }) => {
     const formatDate = (dateString) => {
         if (!dateString) return 'Unknown date';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
         });
     };
 
@@ -32,7 +34,6 @@ const NoteCard = ({ note, onLike }) => {
             setDownloading(true);
             
             // Record download in backend
-            const API_URL = import.meta.env.VITE_API_URL;
             await fetch(`${API_URL}/api/notes/${note.id}/download`, {
                 method: 'POST',
                 headers: {
@@ -139,9 +140,9 @@ const NoteCard = ({ note, onLike }) => {
             
             <CardFooter className="border-t pt-3 flex justify-between">
                 <div className="flex gap-2">
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
+                    <Button
+                        variant="outline"
+                        size="sm"
                         className="text-gray-600 hover:bg-gray-50"
                         onClick={handleView}
                         disabled={!note.fileUrl || viewing}
@@ -159,9 +160,9 @@ const NoteCard = ({ note, onLike }) => {
                         )}
                     </Button>
                     
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
+                    <Button
+                        variant="outline"
+                        size="sm"
                         className="text-gray-600 hover:bg-gray-50"
                         onClick={handleDownload}
                         disabled={!note.fileUrl || downloading}
@@ -180,13 +181,13 @@ const NoteCard = ({ note, onLike }) => {
                     </Button>
                 </div>
                 
-                <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleLike} 
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLike}
                     className={`gap-1 transition-colors ${
-                        note.liked 
-                            ? 'text-red-500 hover:text-red-600' 
+                        note.liked
+                            ? 'text-red-500 hover:text-red-600'
                             : 'text-gray-500 hover:text-red-500'
                     }`}
                     disabled={!isAuthenticated}
