@@ -142,6 +142,7 @@ const NotesSection = () => {
 
     // Handle note upload
     const handleUpload = async () => {
+        console.log('API_URL:', API_URL); // Debugging line
         if (!isAuthenticated) {
             setUploadMessage({ type: 'error', message: 'Please login to upload notes' });
             return;
